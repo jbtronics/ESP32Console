@@ -1,13 +1,14 @@
 #include "./ConsoleCommandD.h"
 #include "Arduino.h"
+#include <iostream>
 
 const static char *TAG = "ConsoleCommandD";
 
 namespace ESP32Console
 {
-    std::unordered_map<std::string, delegateFunc> ArgParseCommand::registry_ = std::unordered_map<std::string, delegateFunc>();
+    std::unordered_map<std::string, delegateFunc> ConsoleCommandD::registry_ = std::unordered_map<std::string, delegateFunc>();
 
-    int ArgParseCommand::delegateResolver(int argc, char **argv)
+    int ConsoleCommandD::delegateResolver(int argc, char **argv)
     {
         // Retrieve ConsoleCommandD from registry
         auto it = registry_.find(argv[0]);
@@ -23,7 +24,7 @@ namespace ESP32Console
 
         try
         {
-            return command(argc, argv, command.parser);
+            return command(argc, argv);
         }
         catch (const std::exception &err)
         {

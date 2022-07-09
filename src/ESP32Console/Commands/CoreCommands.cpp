@@ -1,5 +1,6 @@
 #include "./CoreCommands.h"
 #include "linenoise/linenoise.h"
+#include "Arduino.h"
 //#include "argparse/argparse.hpp"
 
 static int clear(int argc, char **argv)
@@ -35,33 +36,27 @@ static int echo(int argc, char **argv)
 
 static int set_multiline_mode(int argc, char **argv)
 {
-    /*
-    argparse::ArgumentParser program(argv[0]);
-    
-    program.add_argument("mode")
-        .help("Set to 1 to activate multiline mode, set to 0 set to singleline mode.")
-        .scan<'i', int>();
-
-    try
-    {
-        program.parse_args(argc, argv);
-
-        auto mode = program.get<int>("mode");
-        if (mode != 0 && mode != 1)
-        {
-            throw std::runtime_error("Invalid argument value. mode must be either 0 or 1!");
-            return EXIT_FAILURE;
-        }
-
-        linenoiseSetMultiLine(mode);
-        printf("Multiline mode set.\n");
-    }
-    catch (const std::runtime_error &err)
-    {
-        std::cerr << err.what() << std::endl;
-        std::cerr << program;
+    if (argc != 2) {
+        printf("You have to give 'on' or 'off' as an argument!\n");
         return EXIT_FAILURE;
-    }*/
+    }
+
+    //Get argument
+    auto mode = String(argv[1]);
+    //Normalize
+    mode.toLowerCase();
+    
+    if(mode == "on") {
+        linenoiseSetMultiLine(1);
+    } else if (mode == "off") {
+        linenoiseSetMultiLine(0);
+    }
+    else {
+        printf("Unknown option. Pass 'on' or 'off' (without quotes)!\n");
+        return EXIT_FAILURE;
+    }
+
+    printf("Multiline mode set.\n");
 
     return EXIT_SUCCESS;
 }
@@ -80,6 +75,6 @@ namespace ESP32Console::Commands
 
     const ConsoleCommand getSetMultilineCommand()
     {
-        return ConsoleCommand("set_multiline_mode", &set_multiline_mode, "Sets the multiline mode of the console", "(See set_multiline_mode --help for more infos.)");
+        return ConsoleCommand("multiline_mode", &set_multiline_mode, "Sets the multiline mode of the console");
     }
 }

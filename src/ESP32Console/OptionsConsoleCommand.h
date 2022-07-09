@@ -3,17 +3,17 @@
 #include "./ConsoleCommandBase.h"
 
 #include "esp_console.h"
-#include "argparse/argparse.hpp"
+#include "cxxopts/cxxopts.hpp"
 #include <functional>
 #include <unordered_map>
 #include <string>
 
 namespace ESP32Console
 {
-    using argparse::ArgumentParser;
-    using argParseFunc = std::function<int(int, char **, ArgumentParser)>;
+    using cxxopts::Options;
+    using argParseFunc = std::function<int(int, char **, Options)>;
 
-    class ArgParseCommand : public ConsoleCommandBase
+    class OptionsConsoleCommand : public ConsoleCommandBase
     {
     protected:
         argParseFunc delegateFn_;
@@ -22,10 +22,10 @@ namespace ESP32Console
         static int delegateResolver(int argc, char **argv);
 
     public:
-        ArgumentParser parser;
-        static std::unordered_map<std::string, ArgParseCommand> registry_;
+        Options options;
+        static std::unordered_map<std::string, OptionsConsoleCommand> registry_;
 
-        ArgParseCommand(const char *command, argParseFunc func, const char *help, const char *hint = nullptr, const char *version = "1.0")
+        OptionsConsoleCommand(const char *command, argParseFunc func, const char *help, const char *hint = nullptr): options(command, help)
         {
             command_ = command;
             help_ = help;
@@ -40,10 +40,6 @@ namespace ESP32Console
             }
 
             delegateFn_ = func;
-
-            parser = ArgumentParser(command, version);
-            parser.add_description(help);
-
             func_ = &delegateResolver;
         }
 

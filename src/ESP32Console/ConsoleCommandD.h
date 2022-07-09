@@ -1,7 +1,7 @@
 #pragma once
 
-#include "./ConsoleCommandBase.h"
-#include "esp_console.h>
+#include "./ConsoleCommand.h"
+#include "esp_console.h"
 #include <string>
 #include <functional>
 #include <unordered_map>
@@ -27,7 +27,7 @@ namespace ESP32Console
     public:
         static std::unordered_map<std::string, delegateFunc> registry_;
         
-        ConsoleCommandD(const char *command, delegateFunc func, const char* help, const char* hint = ""): ConsoleCommand(command, &delegateResolver, help, hint), delegateFn_(func);
+        ConsoleCommandD(const char *command, delegateFunc func, const char* help, const char* hint = ""): ConsoleCommand(command, &delegateResolver, help, hint), delegateFn_(func) {};
 
         const esp_console_cmd_t toCommandStruct() const
         {
@@ -45,6 +45,6 @@ namespace ESP32Console
         }
 
         delegateFunc &getDelegateFunction() { return delegateFn_; }
-    }
+    };
 
 }

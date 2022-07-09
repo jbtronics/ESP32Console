@@ -1,13 +1,13 @@
-#include "./ArgParseCommand.h"
+#include "./OptionsConsoleCommand.h"
 #include "Arduino.h"
 
 const static char *TAG = "ArgParseCommand";
 
 namespace ESP32Console
 {
-    std::unordered_map<std::string, ArgParseCommand> ArgParseCommand::registry_ = std::unordered_map<std::string, ArgParseCommand>();
+    std::unordered_map<std::string, OptionsConsoleCommand> OptionsConsoleCommand::registry_ = std::unordered_map<std::string, OptionsConsoleCommand>();
 
-    int ArgParseCommand::delegateResolver(int argc, char **argv)
+    int OptionsConsoleCommand::delegateResolver(int argc, char **argv)
     {
         // Retrieve ArgParserCommand from registry
         auto it = registry_.find(argv[0]);
@@ -17,18 +17,18 @@ namespace ESP32Console
             return 1;
         }
 
-        ArgParseCommand command = it->second;
+        OptionsConsoleCommand command = it->second;
 
         int code = 0;
 
         try
         {
-            return command.delegateFn_(argc, argv, command.parser);
+            return command.delegateFn_(argc, argv, command.options);
         }
         catch (const std::runtime_error &err)
         {
             std::cerr << err.what() << std::endl;
-            std::cerr << command.parser;
+            std::cerr << command.options.help();
             return 1;
         }
     }

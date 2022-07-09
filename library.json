@@ -6,7 +6,7 @@
     "repository":
     {
       "type": "git",
-      "url": "https://github.com/username/hello-world.git"
+      "url": "https://github.com/jbtronics/ESP32Console"
     },
     "authors":
     [
@@ -18,7 +18,7 @@
       }
     ],
     "license": "MIT",
-    "homepage": "https://www.helloworld.org/",
+    "homepage": "https://github.com/jbtronics/ESP32Console",
     "dependencies": {
     },
     "frameworks": "arduino",
