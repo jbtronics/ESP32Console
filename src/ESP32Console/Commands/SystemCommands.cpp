@@ -1,5 +1,7 @@
 #include "./SystemCommands.h"
 #include <Arduino.h>
+#include <esp_partition.h>
+#include <esp_ota_ops.h>
 
 static String mac2String(uint64_t mac)
 {
@@ -64,6 +66,10 @@ static int sysInfo(int argc, char **argv)
 
     printf("Sketch size: %d KB\n", ESP.getSketchSize() / (1024));
     printf("Sketch MD5: %s\n", ESP.getSketchMD5().c_str());
+
+    #ifndef CONFIG_APP_REPRODUCIBLE_BUILD
+    printf("Compilation datetime: " __DATE__ " "  __TIME__ "\n");
+    #endif
 
     return EXIT_SUCCESS;
 }
