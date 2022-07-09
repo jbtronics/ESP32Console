@@ -6,6 +6,8 @@ This easily allows you to control and configure your control via serial console 
 
 This library encapsulates the Console component included in the ESP-IDF and allows to use it in an easy "Arduino-way".
 
+![Screenshot of console output](screenshot.png)
+
 ## Features
 * Simple to use
 * Navigatable history, autocompletion with tab for commands (when using an ANSI terminal)
@@ -74,7 +76,7 @@ void setup()
 
     console.begin(115200);
 
-    //Register builtin commands like 'reboot', 'version', or 'meminfo'
+    //Register builtin commands like 'reboot', 'sysinfo', or 'meminfo'
     console.registerSystemCommands();
 
     //Register our own command
