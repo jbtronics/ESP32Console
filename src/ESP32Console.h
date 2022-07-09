@@ -7,4 +7,4 @@
 #include "ESP32Console/Console.h"
 #include "ESP32Console/ConsoleCommand.h"
 #include "ESP32Console/ConsoleCommandD.h"
-//#include "ESP32Console/ArgParseCommand.h"
+#include "ESP32Console/OptionsConsoleCommand.h"

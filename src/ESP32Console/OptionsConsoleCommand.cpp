@@ -17,19 +17,34 @@ namespace ESP32Console
             return 1;
         }
 
-        OptionsConsoleCommand command = it->second;
+        auto command = it->second;
 
         int code = 0;
 
         try
         {
-            return command.delegateFn_(argc, argv, command.options);
+            auto options = command.options;
+            auto result = options.parse(argc, argv);
+
+            //Print help on --help argument
+            if (result.count("help")) {
+                printf(options.help().c_str());
+                printf("\n");
+                return EXIT_SUCCESS;
+            }
+
+            if (command.getVersion() && result.count("version")) {
+                printf("Version: %s\n", command.getVersion());
+                return EXIT_SUCCESS;
+            }
+
+            return command.delegateFn_(argc, argv, result, options);
         }
-        catch (const std::runtime_error &err)
+        catch (const std::exception &err)
         {
-            std::cerr << err.what() << std::endl;
-            std::cerr << command.options.help();
-            return 1;
+            printf(err.what());
+            printf("\n");
+            return EXIT_FAILURE;
         }
     }
 }

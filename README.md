@@ -14,10 +14,22 @@ This library encapsulates the Console component included in the ESP-IDF and allo
 * Persistent history if wished (history gets saved across reboots)
 * Many useful commands included like showing infos about system, memory, network and more (see [commands.md](commands.md) for more info)
 * Easy to implement own commands
+* Easy to use argument parsing using cxxopts (see `argparser` example)
 * Customizable prompt
 * Console works in its own asynchronous task, so you can use your arduino loop() function as you like
 
 ## Usage
+
+## Basic
+
+To use this library you have to do an `#include <ESP32Console.h>` to import all needed files into your project. This library uses namespaces, so you have to do an `using namespace ESP32Console` to not having to prefix all classes (see example below).
+
+You instantiate an `Console` object and initialize it with `Console.begin(BAUD)`. You can specifiy the baud rate and rx/tx pins similar to `Serial.begin`. Please note that you can use EITHER `Serial` OR `Console`. If you try to start ESP32Console after Serial was inited you will get an error.
+
+Using `Console.registerCommand()` you can register your own custom commands. You have to pass a command object (see example below), which contains the name of the command, a little help text and the function which should be executed, when this command is executed. There are different types of commands:
+* `ConsoleCommand`: The "default" console command, which takes a pointer to a function which is executed on call (similar to arduinos `attachInterrupt` function). The function receives an `int argc` which contains the number of arguments and `char** argv` which contains the arguments itself. The function MUST return an integer. Return 0 if everything was successfull, return something else (e.g. 1) if an error happened. This command type has the lowest memory usage.
+* `ConsoleCommandD`: Similar to `ConsoleCommand` but allows to pass an `std::function` object as handler. This allows you to use lambda-functions and `std::bind`
+* `OptionsConsoleCommand`: Allows you to define and parse command options and arguments in an easy way. Uses [cxxopts](https://github.com/jarro2783/cxxopts) for arguments parsing. Every command of this type has an `--help` and `--version` option. See `examples/argparser` for usage.
 
 ### Included commands
 ESP32Console includes many useful commands, which can be registered using their respective `registerXXX()` functions. See [commands.md](commands.md) for a detailed list of the commands.
