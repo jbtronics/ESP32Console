@@ -1,6 +1,5 @@
 #include "./ConsoleCommandD.h"
 #include "Arduino.h"
-#include <iostream>
 
 const static char *TAG = "ConsoleCommandD";
 
@@ -28,7 +27,7 @@ namespace ESP32Console
         }
         catch (const std::exception &err)
         {
-            std::cerr << err.what() << std::endl;
+            printf("%s", err.what());
             return 1;
         }
     }

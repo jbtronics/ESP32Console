@@ -74,6 +74,7 @@ void setup()
     //You can change the console prompt before calling begin(). By default it is "ESP32>"
     console.setPrompt("MyConsole>");
 
+    //You can change the baud rate and pin numbers similar to Serial.begin() here.
     console.begin(115200);
 
     //Register builtin commands like 'reboot', 'sysinfo', or 'meminfo'
@@ -82,6 +83,12 @@ void setup()
     //Register our own command
     //First argument is the name with which the command can be executed, second argument is the function to execute and third one is the description shown in help command.
     console.registerCommand(ConsoleCommand("led", &led, "Turn the LED on or off"));
+
+    //With ConsoleCommandD you can use lambda functions (and anything else that can be cast to std::function). This needs a bit more memory and CPU time than the normal ConsoleCommand.
+    console.registerCommand(ConsoleCommandD("test", [](int argc, char **argv) -> int {
+        printf("Lambda function test\n");
+        return EXIT_SUCCESS;
+    }, "Just a test command!"));
 
     //When console is in use, we can not use Serial.print but you can use printf to output text
     printf("\n\nWelcome to ESP32Console example. Try out typing 'led off' and 'led on' (without quotes) or see 'help' for all commands.");
