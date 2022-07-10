@@ -13,6 +13,7 @@ This library encapsulates the Console component included in the ESP-IDF and allo
 * Navigatable history, autocompletion with tab for commands (when using an ANSI terminal)
 * Persistent history if wished (history gets saved across reboots)
 * Many useful commands included like showing infos about system, memory, network and more (see [commands.md](commands.md) for more info)
+* Ships a simple file editor to modify and create files locally on system if wanted
 * Easy to implement own commands
 * Easy to use argument parsing using cxxopts (see `argparser` example)
 * Customizable prompt
