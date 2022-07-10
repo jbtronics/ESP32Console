@@ -16,6 +16,10 @@
 * `restart`: Restarts the system
 * `meminfo`: Show informations about used and free Heap
 
+## Network commands (loaded by calling registerNetworkCommands())
+
+* `ipconfig`: Shows information about WiFi connection
+
 ## VFS commands (loaded by calling registerVFSCommands())
 
 This functions allows you to navigate through and edit files in ESP-IDFs Virtual Filesystem. Things likes SPIFF, SDCards, some hardware and more are getting mounted into VFS with different prefixes.

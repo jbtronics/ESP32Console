@@ -36,6 +36,7 @@ namespace ESP32Console
     void ESP32Console::Console::registerNetworkCommands()
     {
         registerCommand(getPingCommand());
+        registerCommand(getIpconfigCommand());
     }
 
     void Console::registerVFSCommands()
