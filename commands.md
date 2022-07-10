@@ -16,3 +16,16 @@
 * `restart`: Restarts the system
 * `meminfo`: Show informations about used and free Heap
 
+## VFS commands (loaded by calling registerVFSCommands())
+
+This functions allows you to navigate through and edit files in ESP-IDFs Virtual Filesystem. Things likes SPIFF, SDCards, some hardware and more are getting mounted into VFS with different prefixes.
+The following commands allow an unified access on it.
+
+* `pwd`: Show the current working directory (the directory we are currently in)
+* `cd [PATH]`: Change the current directory
+* `ls [PATH]`: List the contents of the current or given directory
+* `cat [FILES...]`: Show the content of the given files
+* `rm [FILE]`: Delete the given file
+* `rmdir [DIR]`: Delete the given director
+* `mv [ORIGIN] [TARGET]`: Moves/Rename the file to new name/posiion
+* `cp [ORIGIN] [TARGET]`: Copies the contents of origin to target file

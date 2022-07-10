@@ -8,6 +8,7 @@
 #include "driver/uart.h"
 #include "esp_vfs_dev.h"
 #include "linenoise/linenoise.h"
+#include "ESP32Console\Helpers\PWDHelpers.h"
 
 static const char *TAG = "ESP32Console";
 
@@ -173,7 +174,12 @@ namespace ESP32Console
         linenoiseSetMaxLineLen(0);
         while (1)
         {
-            char *line = linenoise(console.prompt_);
+            String prompt = console.prompt_;
+
+            //Insert current PWD into prompt if needed
+            prompt.replace("%pwd%", console_getpwd());
+
+            char *line = linenoise(prompt.c_str());
             if (line == NULL)
             {
                 ESP_LOGD(TAG, "empty line");
