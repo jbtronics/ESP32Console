@@ -19,16 +19,9 @@ static int clear(int argc, char **argv)
 
 static int echo(int argc, char **argv)
 {
-    // Echo implemenation similar to GNU coreutils
-    while (argc > 0)
+    for (int n = 1; n<argc; n++)
     {
-        printf(argv[0]);
-        argc--;
-        argv++;
-        if (argc > 0)
-        {
-            printf("");
-        }
+        printf("%s ", argv[n]);
     }
     printf("\n");
 
@@ -102,6 +95,31 @@ static int history(int argc, char **argv)
     return EXIT_FAILURE;
 }
 
+extern char **environ;
+
+static int env(int argc, char **argv)
+{
+    char **s = environ;
+
+    for (; *s; s++)
+    {
+        printf("%s\n", *s);
+    }
+    return EXIT_SUCCESS;
+}
+
+static int declare(int argc, char **argv)
+{
+    if (argc != 3) {
+        fprintf(stderr, "Syntax: declare VAR short OR declare VARIABLE \"Long Value\"\n");
+        return EXIT_FAILURE; 
+    }
+
+    setenv(argv[1], argv[2], 1);
+
+    return EXIT_SUCCESS;
+}
+
 namespace ESP32Console::Commands
 {
     const ConsoleCommand getClearCommand()
@@ -123,5 +141,15 @@ namespace ESP32Console::Commands
     {
         history_channel = uart_channel;
         return ConsoleCommand("history", &history, "Shows and clear command history (using -c parameter)");
+    }
+
+    const ConsoleCommand getEnvCommand()
+    {
+        return ConsoleCommand("env", &env, "List all environment variables.");
+    }
+
+    const ConsoleCommand getDeclareCommand()
+    {
+        return ConsoleCommand("declare", &declare, "Change enviroment variables");
     }
 }
