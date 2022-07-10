@@ -4,6 +4,7 @@
 #include "ESP32Console/Commands/CoreCommands.h"
 #include "ESP32Console/Commands/SystemCommands.h"
 #include "ESP32Console/Commands/NetworkCommands.h"
+#include "ESP32Console/Commands/VFSCommands.h"
 #include "driver/uart.h"
 #include "esp_vfs_dev.h"
 #include "linenoise/linenoise.h"
@@ -34,6 +35,18 @@ namespace ESP32Console
     void ESP32Console::Console::registerNetworkCommands()
     {
         registerCommand(getPingCommand());
+    }
+
+    void Console::registerVFSCommands()
+    {
+        registerCommand(getCatCommand());
+        registerCommand(getCDCommand());
+        registerCommand(getPWDCommand());
+        registerCommand(getLsCommand());
+        registerCommand(getMvCommand());
+        registerCommand(getCPCommand());
+        registerCommand(getRMCommand());
+        registerCommand(getRMDirCommand());
     }
 
     void Console::beginCommon()
@@ -178,6 +191,9 @@ namespace ESP32Console
             /* Try to run the command */
             int ret;
             esp_err_t err = esp_console_run(line, &ret);
+            //Flush outputs, so we show the output really before linenoise takes over again.
+            fflush(stderr);
+            fflush(stdout);
             if (err == ESP_ERR_NOT_FOUND)
             {
                 printf("Unrecognized command\n");

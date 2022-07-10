@@ -104,13 +104,20 @@ namespace ESP32Console
 
         void registerNetworkCommands();
 
+        void registerVFSCommands();
+
         /**
-         * @brief Set the command prompt. Default is "ESP32>". Must be called before begin() to work!
+         * @brief Set the command prompt. Default is "ESP32>".
          *
          * @param prompt
          */
         void setPrompt(const char *prompt) { prompt_ = prompt; };
 
+        /**
+         * @brief Set the History Max Length object
+         * 
+         * @param max_length 
+         */
         void setHistoryMaxLength(uint16_t max_length)
         {
             max_history_len_ = max_length;
@@ -118,9 +125,9 @@ namespace ESP32Console
         }
 
         /**
-         * @brief Enable saving of command history, which makes history persistent over resets. SPIFF need to be enabled, or you need to pass the filename to use. Must be called before begin() to work!
+         * @brief Enable saving of command history, which makes history persistent over resets. SPIFF need to be enabled, or you need to pass the filename to use.
          *
-         * @param history_save_path The file which will be used to save command history
+         * @param history_save_path The file which will be used to save command history. Set to nullptr to disable persistent saving
          */
         void enablePersistentHistory(const char *history_save_path = "/spiffs/.history.txt") { history_save_path_ = history_save_path; };
 
