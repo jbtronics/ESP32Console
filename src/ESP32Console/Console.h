@@ -122,7 +122,7 @@ namespace ESP32Console
          *
          * @param history_save_path The file which will be used to save command history
          */
-        void enablePersistentHistory(const char *history_save_path = "/data/.history.txt") { history_save_path_ = history_save_path; };
+        void enablePersistentHistory(const char *history_save_path = "/spiffs/.history.txt") { history_save_path_ = history_save_path; };
 
         void begin(int baud, int rxPin = -1, int txPin = -1, uint8_t channel = 0);
 

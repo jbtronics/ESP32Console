@@ -17,6 +17,7 @@ namespace ESP32Console
     void Console::registerCoreCommands()
     {
         registerCommand(getClearCommand());
+        registerCommand(getHistoryCommand());
         registerCommand(getEchoCommand());
         registerCommand(getSetMultilineCommand());
     }
