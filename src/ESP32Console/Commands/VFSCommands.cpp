@@ -8,6 +8,8 @@
 #include <sys/types.h>
 #include "ESP32Console/Helpers/PWDHelpers.h"
 
+#include "kilo/kilo.h"
+
 char *canonicalize_file_name(const char *path);
 
 int cat(int argc, char **argv)
@@ -199,7 +201,7 @@ int cp(int argc, char **argv)
 
     while ((buffer = getc(origin)) != EOF)
     {
-        if(fputc(buffer, target)) {
+        if(fputc(buffer, target) == EOF) {
             fprintf(stderr, "Error writing: %s\n", strerror(errno));
             fclose(origin); fclose(target);
             return 1;
@@ -207,13 +209,16 @@ int cp(int argc, char **argv)
     }
 
     error = errno;
-    if (error)
+    if (error && !feof(origin))
     {
         fprintf(stderr, "Error copying: %s\n", strerror(error));
         fclose(origin);
         fclose(target);
         return 1;
     }
+
+    fclose(origin);
+    fclose(target);
 
     return EXIT_SUCCESS;
 }
@@ -294,5 +299,10 @@ namespace ESP32Console::Commands
     const ConsoleCommand getRMDirCommand()
     {
         return ConsoleCommand("rmdir", &rmdir, "Permanenty deletes the given folder. Folder must be empty!");
+    }
+
+    const ConsoleCommand getEditCommand()
+    {
+        return ConsoleCommand("edit", &ESP32Console::Kilo::kilo, "Edit files");
     }
 }

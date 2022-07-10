@@ -113,7 +113,11 @@ void loop()
 ```
 
 ## Credits
-This library utilizes the console component of ESP-IDF written by Espressif at core. Argument parsing is done by [cxxopts](https://github.com/jarro2783/cxxopts).
+* This library utilizes the console component of ESP-IDF written by Espressif at core.
+* Argument parsing is done by [cxxopts](https://github.com/jarro2783/cxxopts).
+* As editor a modified version of [kilo](https://github.com/antirez/kilo) is used.
 
 ## LICENSE
 ESP32Console is licensed under MIT LICENSE. See [LICENSE file](LICENSE) for more info.
+
+kilo shipped with ESP32Console is licensed under BSD-2 clause license. See the respective file for more info. 

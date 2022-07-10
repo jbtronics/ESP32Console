@@ -48,6 +48,7 @@ namespace ESP32Console
         registerCommand(getCPCommand());
         registerCommand(getRMCommand());
         registerCommand(getRMDirCommand());
+        registerCommand(getEditCommand());
     }
 
     void Console::beginCommon()
@@ -60,11 +61,13 @@ namespace ESP32Console
         linenoiseHistorySetMaxLen(max_history_len_);
 
         /* Set command maximum length */
-        linenoiseSetMaxLineLen(max_history_len_);
+        linenoiseSetMaxLineLen(max_cmdline_len_);
 
-        /* Don't return empty lines */
-        linenoiseAllowEmpty(false);
-
+        // Load history if defined
+        if (history_save_path_)
+        {
+            linenoiseHistoryLoad(history_save_path_);
+        }
 
         // Register core commands like echo
         esp_console_register_help_command();
@@ -118,16 +121,16 @@ namespace ESP32Console
         esp_console_config_t console_config = {
             .max_cmdline_length = max_cmdline_len_,
             .max_cmdline_args = max_cmdline_args_,
-            .hint_color = 333333
-        };
+            .hint_color = 333333};
 
         ESP_ERROR_CHECK(esp_console_init(&console_config));
 
         /* Change standard input and output of the task if the requested UART is
          * NOT the default one. This block will replace stdin, stdout and stderr.
          */
-        if (channel != CONFIG_ESP_CONSOLE_UART_NUM) {
-            char path[12] = { 0 };
+        if (channel != CONFIG_ESP_CONSOLE_UART_NUM)
+        {
+            char path[12] = {0};
             snprintf(path, 12, "/dev/uart/%d", channel);
 
             stdin = fopen(path, "r");
@@ -157,9 +160,10 @@ namespace ESP32Console
                "Use UP/DOWN arrows to navigate through command history.\r\n"
                "Press TAB when typing command name to auto-complete.\r\n");
 
-        //Probe terminal status
+        // Probe terminal status
         int probe_status = linenoiseProbe();
-        if(probe_status) {
+        if (probe_status)
+        {
             linenoiseSetDumbMode(1);
         }
 
@@ -171,12 +175,13 @@ namespace ESP32Console
                    "On Windows, try using Putty instead.\r\n");
         }
 
-        linenoiseSetMaxLineLen(0);
+        linenoiseSetMaxLineLen(console.max_cmdline_len_);
+        linenoiseAllowEmpty(false);
         while (1)
         {
             String prompt = console.prompt_;
 
-            //Insert current PWD into prompt if needed
+            // Insert current PWD into prompt if needed
             prompt.replace("%pwd%", console_getpwd());
 
             char *line = linenoise(prompt.c_str());
@@ -186,8 +191,12 @@ namespace ESP32Console
                 /* Ignore empty lines */
                 continue;
             }
+
+            log_d("Line parsed: %s", line);
+
             /* Add the command to the history */
             linenoiseHistoryAdd(line);
+            
             /* Save command history to filesystem */
             if (console.history_save_path_)
             {
@@ -197,9 +206,6 @@ namespace ESP32Console
             /* Try to run the command */
             int ret;
             esp_err_t err = esp_console_run(line, &ret);
-            //Flush outputs, so we show the output really before linenoise takes over again.
-            fflush(stderr);
-            fflush(stdout);
             if (err == ESP_ERR_NOT_FOUND)
             {
                 printf("Unrecognized command\n");
@@ -225,6 +231,5 @@ namespace ESP32Console
 
     void Console::end()
     {
-
     }
 };

@@ -29,3 +29,4 @@ The following commands allow an unified access on it.
 * `rmdir [DIR]`: Delete the given director
 * `mv [ORIGIN] [TARGET]`: Moves/Rename the file to new name/posiion
 * `cp [ORIGIN] [TARGET]`: Copies the contents of origin to target file
+* `edit [FILE]`: Opens a file editor with a visual editor. Use `Strg + S` to save, `Strg + Q` to quit and `Strg + F` to search in file.
