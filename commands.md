@@ -19,6 +19,7 @@
 ## Network commands (loaded by calling registerNetworkCommands())
 
 * `ipconfig`: Shows information about WiFi connection
+* `ping [HOST]`: Pings a hostname. You can change the number of pings done with `-n`parameter. Use `-n 0` for infinite pinging. You can stop the ping by `Strg + C` or `Strg + D`.
 
 ## VFS commands (loaded by calling registerVFSCommands())
 

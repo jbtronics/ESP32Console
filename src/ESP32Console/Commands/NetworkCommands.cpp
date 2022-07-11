@@ -8,12 +8,9 @@
 #include "lwip/netdb.h"
 #include "lwip/sockets.h"
 
-#include "WiFi.h"
+#include <unistd.h>
 
-static int ping(int argc, char **argv)
-{
-    return EXIT_SUCCESS;
-}
+#include "WiFi.h"
 
 static const char *wlstatus2string(wl_status_t status)
 {
@@ -54,6 +51,155 @@ const char* wlmode2string(wifi_mode_t mode)
         default:
             return "Unknown";
     }
+}
+
+static void on_ping_success(esp_ping_handle_t hdl, void *args)
+{
+    int* number_of_pings_remaining = (int*) args;
+
+    uint8_t ttl;
+    uint16_t seqno;
+    uint32_t elapsed_time, recv_len;
+    ip_addr_t target_addr;
+    esp_ping_get_profile(hdl, ESP_PING_PROF_SEQNO, &seqno, sizeof(seqno));
+    esp_ping_get_profile(hdl, ESP_PING_PROF_TTL, &ttl, sizeof(ttl));
+    esp_ping_get_profile(hdl, ESP_PING_PROF_IPADDR, &target_addr, sizeof(target_addr));
+    esp_ping_get_profile(hdl, ESP_PING_PROF_SIZE, &recv_len, sizeof(recv_len));
+    esp_ping_get_profile(hdl, ESP_PING_PROF_TIMEGAP, &elapsed_time, sizeof(elapsed_time));
+    printf("%d bytes from %s icmp_seq=%d ttl=%d time=%d ms\n",
+           recv_len, inet_ntoa(target_addr.u_addr.ip4), seqno, ttl, elapsed_time);
+
+    (*number_of_pings_remaining)--;
+}
+
+static void on_ping_timeout(esp_ping_handle_t hdl, void *args)
+{
+    int number_of_pings_remaining = *(int*) args;
+
+
+    const int number_of_pings = *(int*) args;
+
+    uint16_t seqno;
+    ip_addr_t target_addr;
+    esp_ping_get_profile(hdl, ESP_PING_PROF_SEQNO, &seqno, sizeof(seqno));
+    esp_ping_get_profile(hdl, ESP_PING_PROF_IPADDR, &target_addr, sizeof(target_addr));
+    printf("From %s icmp_seq=%d timeout\n", inet_ntoa(target_addr.u_addr.ip4), seqno);
+
+    number_of_pings_remaining--;
+}
+
+static void on_ping_end(esp_ping_handle_t hdl, void *args)
+{
+}
+
+static int ping(int argc, char **argv)
+{
+    //By default do 5 pings
+    int number_of_pings = 5;
+
+    int opt;
+    while ((opt = getopt(argc, argv, "n:")) != -1) {
+        switch(opt) {
+            case 'n':
+                number_of_pings = atoi(optarg);
+                break;
+            case '?':
+                printf("Unknown option: %c\n", optopt);
+                break;
+            case ':':
+                printf("Missing arg for %c\n", optopt);
+                break;
+
+            default:
+                fprintf(stderr, "Usage: ping -n 5 [HOSTNAME]\n");
+                fprintf(stderr, "-n: The number of pings. 0 means infinite. Can be aborted with Ctrl+D or Ctrl+C.");
+                return 1;
+        }
+    }
+
+    int argind = optind;
+
+    //Get hostname
+    if (argind >= argc) {
+        fprintf(stderr, "You need to pass an hostname!\n");
+        return EXIT_FAILURE;
+    }
+
+    char* hostname = argv[argind];
+
+    /* convert hostname to IP address */
+    ip_addr_t target_addr;
+    struct addrinfo hint;
+    struct addrinfo *res = NULL;
+    memset(&hint, 0, sizeof(hint));
+    memset(&target_addr, 0, sizeof(target_addr));
+    auto result = getaddrinfo(hostname, NULL, &hint, &res);
+
+    if (result) {
+        fprintf(stderr, "Could not resolve hostname! (getaddrinfo returned %d)\n", result);
+        return 1;
+    }
+
+    struct in_addr addr4 = ((struct sockaddr_in *) (res->ai_addr))->sin_addr;
+    inet_addr_to_ip4addr(ip_2_ip4(&target_addr), &addr4);
+    freeaddrinfo(res);
+
+    int number_of_pings_remaining = number_of_pings;
+
+    //Configure ping session
+    esp_ping_config_t ping_config = ESP_PING_DEFAULT_CONFIG();
+    ping_config.task_stack_size = 4096;
+    ping_config.target_addr = target_addr;          // target IP address
+    ping_config.count = number_of_pings;   // 0 means infinite ping
+
+    /* set callback functions */
+    esp_ping_callbacks_t cbs;
+    cbs.on_ping_success = on_ping_success;
+    cbs.on_ping_timeout = on_ping_timeout;
+    cbs.on_ping_end = on_ping_end;
+    //Pass a variable as pointer so the sub tasks can decrease it
+    cbs.cb_args = &number_of_pings_remaining;
+
+    esp_ping_handle_t ping;
+    esp_ping_new_session(&ping_config, &cbs, &ping);
+
+    esp_ping_start(ping);
+
+    char c;
+    
+    uint16_t seqno;
+    esp_ping_get_profile(ping, ESP_PING_PROF_SEQNO, &seqno, sizeof(seqno));
+    
+    //Make stdin input non blocking so we can query for input AND check ping seqno
+    int flags = fcntl(fileno(stdin), F_GETFL, 0);
+    fcntl(fileno(stdin), F_SETFL, flags | O_NONBLOCK);
+
+    //Wait for Ctrl+D or Ctr+C or that our task finishes
+    //The async tasks decrease number_of_pings, so wait for it to get to 0
+    while((number_of_pings == 0 || seqno < number_of_pings) && c != 4 && c != 3) {
+        esp_ping_get_profile(ping, ESP_PING_PROF_SEQNO, &seqno, sizeof(seqno));
+        c = getc(stdin);
+        delay(50);
+    }
+
+    //Reset flags, so we dont end up destroying our terminal env later, when linenoise takes over again
+    fcntl(fileno(stdin), F_SETFL, flags);
+
+    esp_ping_stop(ping);
+    //Print total statistics
+    uint32_t transmitted;
+    uint32_t received;
+    uint32_t total_time_ms;
+    esp_ping_get_profile(ping, ESP_PING_PROF_REQUEST, &transmitted, sizeof(transmitted));
+    esp_ping_get_profile(ping, ESP_PING_PROF_REPLY, &received, sizeof(received));
+    esp_ping_get_profile(ping, ESP_PING_PROF_DURATION, &total_time_ms, sizeof(total_time_ms));
+    printf("%d packets transmitted, %d received, time %dms\n", transmitted, received, total_time_ms);
+
+
+
+    esp_ping_delete_session(ping);
+
+    return EXIT_SUCCESS;
 }
 
 static void ipconfig_wlan()

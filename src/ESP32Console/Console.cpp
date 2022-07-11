@@ -148,6 +148,14 @@ namespace ESP32Console
         }
     }
 
+    static void resetAfterCommands()
+    {
+        //Reset all global states a command could change
+
+        //Reset getopt parameters
+        optind = 0;
+    }
+
     void Console::repl_task(void *args)
     {
         Console &console = *(static_cast<Console *>(args));
@@ -177,7 +185,6 @@ namespace ESP32Console
         }
 
         linenoiseSetMaxLineLen(console.max_cmdline_len_);
-        linenoiseAllowEmpty(false);
         while (1)
         {
             String prompt = console.prompt_;
@@ -207,6 +214,10 @@ namespace ESP32Console
             /* Try to run the command */
             int ret;
             esp_err_t err = esp_console_run(line, &ret);
+            
+            //Reset global state
+            resetAfterCommands();
+            
             if (err == ESP_ERR_NOT_FOUND)
             {
                 printf("Unrecognized command\n");
