@@ -2,6 +2,7 @@
 #include <Arduino.h>
 #include <esp_partition.h>
 #include <esp_ota_ops.h>
+#include <esp_system.h>
 
 static String mac2String(uint64_t mac)
 {
@@ -39,6 +40,36 @@ static const char* getFlashModeStr()
     }
 }
 
+static const char* getResetReasonStr()
+{
+    switch(esp_reset_reason()) {
+        case ESP_RST_BROWNOUT:
+            return "Brownout reset (software or hardware)";
+        case ESP_RST_DEEPSLEEP:
+            return "Reset after exiting deep sleep mode";
+        case ESP_RST_EXT:
+            return "Reset by external pin (not applicable for ESP32)";
+        case ESP_RST_INT_WDT:
+            return "Reset (software or hardware) due to interrupt watchdog";
+        case ESP_RST_PANIC:
+            return "Software reset due to exception/panic";
+        case ESP_RST_POWERON:
+            return "Reset due to power-on event";
+        case ESP_RST_SDIO:
+            return "Reset over SDIO";
+        case ESP_RST_SW:
+            return "Software reset via esp_restart";
+        case ESP_RST_TASK_WDT:
+            return "Reset due to task watchdog";
+        case ESP_RST_WDT:
+            return "ESP_RST_WDT";
+        
+        case ESP_RST_UNKNOWN:
+        default:
+            return "Unknown";
+    }
+}
+
 static int sysInfo(int argc, char **argv)
 {
     esp_chip_info_t info;
@@ -71,6 +102,9 @@ static int sysInfo(int argc, char **argv)
     printf("Compilation datetime: " __DATE__ " "  __TIME__ "\n");
     #endif
 
+    
+    printf("\nReset reason: %s\n", getResetReasonStr());
+
     return EXIT_SUCCESS;
 }
 
@@ -86,8 +120,10 @@ static int meminfo(int argc, char** argv)
     uint32_t free = ESP.getFreeHeap() / 1024;
     uint32_t total = ESP.getHeapSize() / 1024;
     uint32_t used = total - free;
+    uint32_t min = ESP.getMinFreeHeap() / 1024;
 
     printf("Heap: %d KB free, %d KB used, (%d KB total)\n", free, used, total);
+    printf("Minimum free heap size during uptime was: %d KB\n", min);
     return EXIT_SUCCESS;
 }
 
