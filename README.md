@@ -6,7 +6,7 @@ This easily allows you to control and configure your control via serial console 
 
 This library encapsulates the Console component included in the ESP-IDF and allows to use it in an easy "Arduino-way".
 
-![Screenshot of console output](screenshot.png)
+![Screenshot of console output](extras/screenshot.png)
 
 ## Features
 * Simple to use
