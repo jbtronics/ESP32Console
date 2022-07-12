@@ -2,7 +2,7 @@
     "name": "ESP32Console",
     "version": "1.0.0",
     "description": "Extensible UART console for ESP32 with useful included commands. This library encapsules the console component of ESP-IDF and make them easy to use in an Arduino environment.",
-    "keywords": "esp32, console",
+    "keywords": "esp32, console, ping, ifconfig, sysinfo, editor, file",
     "repository":
     {
       "type": "git",
@@ -21,6 +21,10 @@
     "homepage": "https://github.com/jbtronics/ESP32Console",
     "dependencies": {
     },
+    "exclude": [
+      ".github",
+      "extras"
+    ],
     "frameworks": "arduino",
-    "platforms": "esp32"
+    "platforms": "espressif32"
   }
