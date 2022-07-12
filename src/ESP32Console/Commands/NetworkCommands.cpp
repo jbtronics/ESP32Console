@@ -55,8 +55,6 @@ const char* wlmode2string(wifi_mode_t mode)
 
 static void on_ping_success(esp_ping_handle_t hdl, void *args)
 {
-    int* number_of_pings_remaining = (int*) args;
-
     uint8_t ttl;
     uint16_t seqno;
     uint32_t elapsed_time, recv_len;
@@ -66,26 +64,17 @@ static void on_ping_success(esp_ping_handle_t hdl, void *args)
     esp_ping_get_profile(hdl, ESP_PING_PROF_IPADDR, &target_addr, sizeof(target_addr));
     esp_ping_get_profile(hdl, ESP_PING_PROF_SIZE, &recv_len, sizeof(recv_len));
     esp_ping_get_profile(hdl, ESP_PING_PROF_TIMEGAP, &elapsed_time, sizeof(elapsed_time));
-    printf("%d bytes from %s icmp_seq=%d ttl=%d time=%d ms\n",
+    printf("%u bytes from %s icmp_seq=%d ttl=%d time=%u ms\n",
            recv_len, inet_ntoa(target_addr.u_addr.ip4), seqno, ttl, elapsed_time);
-
-    (*number_of_pings_remaining)--;
 }
 
 static void on_ping_timeout(esp_ping_handle_t hdl, void *args)
 {
-    int number_of_pings_remaining = *(int*) args;
-
-
-    const int number_of_pings = *(int*) args;
-
     uint16_t seqno;
     ip_addr_t target_addr;
     esp_ping_get_profile(hdl, ESP_PING_PROF_SEQNO, &seqno, sizeof(seqno));
     esp_ping_get_profile(hdl, ESP_PING_PROF_IPADDR, &target_addr, sizeof(target_addr));
-    printf("From %s icmp_seq=%d timeout\n", inet_ntoa(target_addr.u_addr.ip4), seqno);
-
-    number_of_pings_remaining--;
+    printf("From %s icmp_seq=%u timeout\n", inet_ntoa(target_addr.u_addr.ip4), seqno);
 }
 
 static void on_ping_end(esp_ping_handle_t hdl, void *args)
@@ -144,8 +133,6 @@ static int ping(int argc, char **argv)
     inet_addr_to_ip4addr(ip_2_ip4(&target_addr), &addr4);
     freeaddrinfo(res);
 
-    int number_of_pings_remaining = number_of_pings;
-
     //Configure ping session
     esp_ping_config_t ping_config = ESP_PING_DEFAULT_CONFIG();
     ping_config.task_stack_size = 4096;
@@ -158,14 +145,14 @@ static int ping(int argc, char **argv)
     cbs.on_ping_timeout = on_ping_timeout;
     cbs.on_ping_end = on_ping_end;
     //Pass a variable as pointer so the sub tasks can decrease it
-    cbs.cb_args = &number_of_pings_remaining;
+    //cbs.cb_args = &number_of_pings_remaining;
 
     esp_ping_handle_t ping;
     esp_ping_new_session(&ping_config, &cbs, &ping);
 
     esp_ping_start(ping);
 
-    char c;
+    char c = 0;
     
     uint16_t seqno;
     esp_ping_get_profile(ping, ESP_PING_PROF_SEQNO, &seqno, sizeof(seqno));
@@ -193,7 +180,7 @@ static int ping(int argc, char **argv)
     esp_ping_get_profile(ping, ESP_PING_PROF_REQUEST, &transmitted, sizeof(transmitted));
     esp_ping_get_profile(ping, ESP_PING_PROF_REPLY, &received, sizeof(received));
     esp_ping_get_profile(ping, ESP_PING_PROF_DURATION, &total_time_ms, sizeof(total_time_ms));
-    printf("%d packets transmitted, %d received, time %dms\n", transmitted, received, total_time_ms);
+    printf("%u packets transmitted, %u received, time %u ms\n", transmitted, received, total_time_ms);
 
 
 

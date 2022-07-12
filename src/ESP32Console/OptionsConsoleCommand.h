@@ -64,7 +64,7 @@ namespace ESP32Console
             func_ = &delegateResolver;
         }
 
-        const esp_console_cmd_t toCommandStruct() const
+        const esp_console_cmd_t toCommandStruct() const override
         {
             const esp_console_cmd_t cmd = {
                 .command = command_,

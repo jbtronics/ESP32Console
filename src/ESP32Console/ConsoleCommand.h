@@ -25,7 +25,7 @@ namespace ESP32Console
          */
         ConsoleCommand(const char *command, esp_console_cmd_func_t func, const char* help, const char* hint = "") { command_ = command; func_ = func; help_= help; hint_ = hint;};
 
-        const esp_console_cmd_t toCommandStruct() const
+        const esp_console_cmd_t toCommandStruct() const override
         {
             const esp_console_cmd_t cmd = {
                 .command = command_,

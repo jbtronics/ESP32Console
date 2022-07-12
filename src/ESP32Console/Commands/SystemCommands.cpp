@@ -130,8 +130,8 @@ static int meminfo(int argc, char** argv)
     uint32_t used = total - free;
     uint32_t min = ESP.getMinFreeHeap() / 1024;
 
-    printf("Heap: %d KB free, %d KB used, (%d KB total)\n", free, used, total);
-    printf("Minimum free heap size during uptime was: %d KB\n", min);
+    printf("Heap: %u KB free, %u KB used, (%u KB total)\n", free, used, total);
+    printf("Minimum free heap size during uptime was: %u KB\n", min);
     return EXIT_SUCCESS;
 }
 

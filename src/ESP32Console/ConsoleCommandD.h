@@ -29,7 +29,7 @@ namespace ESP32Console
         
         ConsoleCommandD(const char *command, delegateFunc func, const char* help, const char* hint = ""): ConsoleCommand(command, &delegateResolver, help, hint), delegateFn_(func) {};
 
-        const esp_console_cmd_t toCommandStruct() const
+        const esp_console_cmd_t toCommandStruct() const override
         {
             const esp_console_cmd_t cmd = {
                 .command = command_,
