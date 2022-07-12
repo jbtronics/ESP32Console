@@ -1,8 +1,13 @@
 #include "./SystemCommands.h"
+#include "ESP32Console.h"
 #include <Arduino.h>
 #include <esp_partition.h>
 #include <esp_ota_ops.h>
 #include <esp_system.h>
+#include <core_version.h>
+
+//For XSTR macros
+#include <xtensa/xtruntime.h>
 
 static String mac2String(uint64_t mac)
 {
@@ -75,8 +80,11 @@ static int sysInfo(int argc, char **argv)
     esp_chip_info_t info;
     esp_chip_info(&info);
 
-    printf("IDF Version: %s\n", ESP.getSdkVersion());
+    printf("ESP32Console version: %s\n", ESP32CONSOLE_VERSION);
+    printf("Arduino Core version: %s (%x)\n", XTSTR(ARDUINO_ESP32_GIT_DESC), ARDUINO_ESP32_GIT_VER);
+    printf("ESP-IDF Version: %s\n", ESP.getSdkVersion());
 
+    printf("\n");
     printf("Chip info:\n");
     printf("\tModel: %s\n", ESP.getChipModel());
     printf("\tRevison number: %d\n", ESP.getChipRevision());
