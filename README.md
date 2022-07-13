@@ -21,7 +21,7 @@ This library encapsulates the Console component included in the ESP-IDF and allo
 
 ## Usage
 
-## Basic
+### Basic
 
 To use this library you have to do an `#include <ESP32Console.h>` to import all needed files into your project. This library uses namespaces, so you have to do an `using namespace ESP32Console` to not having to prefix all classes (see example below).
 
@@ -35,7 +35,20 @@ Using `Console.registerCommand()` you can register your own custom commands. You
 ### Included commands
 ESP32Console includes many useful commands, which can be registered using their respective `registerXXX()` functions. See [commands.md](commands.md) for a detailed list of the commands.
 
-### Examples
+### Computer side
+You can use almost any terminal software on PC for connecting with ESP32Console. You can use a simple terminal like the one included in Arduino but it is highly recommended to use a VT100 compatible terminal (e.g. PuTTY on windows).
+This kind of terminal is needed for more complex functions like auto-complete with TAB, history scrolling, colors and more.
+
+If you use a VT100 compatible terminal you can use the keybinds, when in prompt:
+* `Ctrl + L`: Clear screen
+* `Ctrl + A`: Jump cursor to begin of line
+* `Ctrl + E`: Jump cursor to end of line
+* `Ctrl + U`: Delete whole line
+* `Ctrl + K`: Delete from current position to end of line
+* `Ctrl + W`: Delete previous word
+* `Ctrl + T`: Swap current character with previous one
+
+## Examples
 A simple usage can be seen here (see `examples/simple.ino`):
 More advanced usages can be found in `examples/` folder.
 
