@@ -93,6 +93,7 @@ namespace ESP32Console
                 .help = help,
                 .hint = hint,
                 .func = func,
+                .argtable = nullptr
             };
 
             return registerCommand(&cmd);

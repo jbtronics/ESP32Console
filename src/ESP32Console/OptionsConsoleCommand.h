@@ -71,7 +71,8 @@ namespace ESP32Console
                 .help = help_,
                 .hint = hint_,
                 .func = func_,
-                .argtable = nullptr};
+                .argtable = nullptr
+                };
 
             // When the command gets registered add it to our map, so we can access it later to resolve the delegated function call
             registry_.insert({std::string(command_), std::move(*this)});
