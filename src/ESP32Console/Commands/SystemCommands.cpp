@@ -113,6 +113,9 @@ static int sysInfo(int argc, char **argv)
     
     printf("\nReset reason: %s\n", getResetReasonStr());
 
+    printf("\n");
+    printf("CPU temperature: %.01f °C\n", temperatureRead());
+
     return EXIT_SUCCESS;
 }
 
