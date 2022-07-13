@@ -13,11 +13,13 @@ This library encapsulates the Console component included in the ESP-IDF and allo
 * Navigatable history, autocompletion with tab for commands (when using an ANSI terminal)
 * Persistent history if wished (history gets saved across reboots)
 * Many useful commands included like showing infos about system, memory, network and more (see [commands.md](commands.md) for more info)
-* Ships a simple file editor to modify and create files locally on system if wanted
+* Console works in its own asynchronous task, so you can use your arduino loop() function as you like
+* Support for environment variables and variable interpolation in commands
 * Easy to implement own commands
 * Easy to use argument parsing using cxxopts (see `argparser` example)
 * Customizable prompt
-* Console works in its own asynchronous task, so you can use your arduino loop() function as you like
+* Ships a simple file editor to modify and create files locally on system if wanted
+
 
 ## Usage
 
@@ -34,6 +36,10 @@ Using `Console.registerCommand()` you can register your own custom commands. You
 
 ### Included commands
 ESP32Console includes many useful commands, which can be registered using their respective `registerXXX()` functions. See [commands.md](commands.md) for a detailed list of the commands.
+
+### Environment variables
+The ESP32Console supports environment variables and string interpolation in the console. You can use `env` command to list all existing environment variables and `declare [VAR] [VALUE]` to change one. In the console prompt `$ENV` and `${ENV}` will get replaced by the value of the defined env value. With that you can for example define a variable with `declare HOST www.github.com` and access it in other commands: `ping $HOST`.
+You can change and predefine env variables from your code. See `examples/gpio` for more info.
 
 ### Computer side
 You can use almost any terminal software on PC for connecting with ESP32Console. You can use a simple terminal like the one included in Arduino but it is highly recommended to use a VT100 compatible terminal (e.g. PuTTY on windows).
