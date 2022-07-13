@@ -135,3 +135,10 @@ void loop()
 ESP32Console is licensed under MIT LICENSE. See [LICENSE file](LICENSE) for more info.
 
 kilo shipped with ESP32Console is licensed under BSD-2 clause license. See the respective file for more info. 
+
+## TODO
+* Add more useful commands
+* Easy integration of colors and console styles
+* Support of command batch files
+* Add support for ESP8266 (this should be possible in theory as the old RTOS-SDK already ships the console parts)
+* Check if more complex terminal stuff, like pipes, output redirection and similar is possible (difficult due only having one global stdout)
