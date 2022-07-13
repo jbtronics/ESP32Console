@@ -15,7 +15,7 @@
 * `sysinfo`: Prints info about the chip model, revision, ESP-IDF version, EFuse MAC, flash and PSRAM
 * `restart`: Restarts the system
 * `meminfo`: Show informations about used and free Heap
-* `date`: Shows and set the current system time. Change time with `date -s "2022-07-13 22:47:00"`. Timezone can be set by changing the `TZ` env variable (e.g. `declare TZ CET-1`)
+* `date`: Shows and set the current system time. Change time with `date -s "2022-07-13 22:47:00"`. Timezone can be set by changing the `TZ` env variable (e.g. `declare TZ CET-1`).
 
 ## Network commands (loaded by calling registerNetworkCommands())
 
