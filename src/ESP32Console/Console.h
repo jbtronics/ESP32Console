@@ -107,6 +107,8 @@ namespace ESP32Console
 
         void registerVFSCommands();
 
+        void registerGPIOCommands();
+
         /**
          * @brief Set the command prompt. Default is "ESP32>".
          *

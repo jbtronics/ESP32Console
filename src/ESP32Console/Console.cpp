@@ -5,6 +5,7 @@
 #include "ESP32Console/Commands/SystemCommands.h"
 #include "ESP32Console/Commands/NetworkCommands.h"
 #include "ESP32Console/Commands/VFSCommands.h"
+#include "ESP32Console/Commands/GPIOCommands.h"
 #include "driver/uart.h"
 #include "esp_vfs_dev.h"
 #include "linenoise/linenoise.h"
@@ -50,6 +51,14 @@ namespace ESP32Console
         registerCommand(getRMCommand());
         registerCommand(getRMDirCommand());
         registerCommand(getEditCommand());
+    }
+
+    void Console::registerGPIOCommands()
+    {
+        registerCommand(getPinModeCommand());
+        registerCommand(getDigitalReadCommand());
+        registerCommand(getDigitalWriteCommand());
+        registerCommand(getAnalogReadCommand());
     }
 
     void Console::beginCommon()

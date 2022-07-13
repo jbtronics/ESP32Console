@@ -35,3 +35,11 @@ The following commands allow an unified access on it.
 * `mv [ORIGIN] [TARGET]`: Moves/Rename the file to new name/posiion
 * `cp [ORIGIN] [TARGET]`: Copies the contents of origin to target file
 * `edit [FILE]`: Opens a file editor with a visual editor. Use `Strg + S` to save, `Strg + Q` to quit and `Strg + F` to search in file.
+
+## GPIO commands (loaded by calling registerGPIOCommands())
+The commands allow you to read and change the states of the ESPs GPIO pins. They are similar to the arduino included functions:
+
+* `pinMode [PIN] [MODE]`: Change the pinMode of an GPIO
+* `digitalRead [PIN]`: Reads the state of an digital GPIO
+* `digitalWrite [PIN] [LEVEL]`: Changes the state of an digital GPIO
+* `analogRead [PIN]`: Reads the voltage applied to an analog GPIO in millivolts
