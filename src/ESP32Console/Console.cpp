@@ -33,6 +33,7 @@ namespace ESP32Console
         registerCommand(getSysInfoCommand());
         registerCommand(getRestartCommand());
         registerCommand(getMemInfoCommand());
+        registerCommand(getDateCommand());
     }
 
     void ESP32Console::Console::registerNetworkCommands()
