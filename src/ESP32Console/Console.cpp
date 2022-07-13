@@ -10,6 +10,7 @@
 #include "esp_vfs_dev.h"
 #include "linenoise/linenoise.h"
 #include "ESP32Console/Helpers/PWDHelpers.h"
+#include "ESP32Console/Helpers/InputParser.h"
 
 static const char *TAG = "ESP32Console";
 
@@ -209,7 +210,7 @@ namespace ESP32Console
                 continue;
             }
 
-            log_d("Line parsed: %s", line);
+            log_v("Line received from linenoise: %s\n", line);
 
             /* Add the command to the history */
             linenoiseHistoryAdd(line);
@@ -220,9 +221,13 @@ namespace ESP32Console
                 linenoiseHistorySave(console.history_save_path_);
             }
 
+            //Interpolate the input line
+            String interpolated_line = interpolateLine(line);
+            log_v("Interpolated line: %s\n", interpolated_line.c_str());
+
             /* Try to run the command */
             int ret;
-            esp_err_t err = esp_console_run(line, &ret);
+            esp_err_t err = esp_console_run(interpolated_line.c_str(), &ret);
             
             //Reset global state
             resetAfterCommands();

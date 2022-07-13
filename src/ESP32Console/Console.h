@@ -134,6 +134,14 @@ namespace ESP32Console
          */
         void enablePersistentHistory(const char *history_save_path = "/spiffs/.history.txt") { history_save_path_ = history_save_path; };
 
+        /**
+         * @brief Starts the console. Similar to the Serial.begin() function
+         * 
+         * @param baud The baud rate with which the console should work. Recommended: 115200
+         * @param rxPin The pin to use for RX
+         * @param txPin The pin to use for TX
+         * @param channel The number of the UART to use
+         */
         void begin(int baud, int rxPin = -1, int txPin = -1, uint8_t channel = 0);
 
         void end();
