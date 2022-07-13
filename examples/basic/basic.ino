@@ -43,7 +43,7 @@ void setup()
     pinMode(LED, OUTPUT);
 
     //You can change the console prompt before calling begin(). By default it is "ESP32>"
-    console.setPrompt("MyConsole>");
+    console.setPrompt("MyConsole> ");
 
     //You can change the baud rate and pin numbers similar to Serial.begin() here.
     console.begin(115200);
