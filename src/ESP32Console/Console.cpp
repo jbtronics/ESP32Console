@@ -8,7 +8,7 @@
 #include "driver/uart.h"
 #include "esp_vfs_dev.h"
 #include "linenoise/linenoise.h"
-#include "ESP32Console\Helpers\PWDHelpers.h"
+#include "ESP32Console/Helpers/PWDHelpers.h"
 
 static const char *TAG = "ESP32Console";
 
@@ -217,7 +217,7 @@ namespace ESP32Console
             
             //Reset global state
             resetAfterCommands();
-            
+
             if (err == ESP_ERR_NOT_FOUND)
             {
                 printf("Unrecognized command\n");
