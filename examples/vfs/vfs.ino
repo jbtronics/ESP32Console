@@ -7,8 +7,6 @@
 #include <FS.h>
 #include "SPIFFS.h"
 
-#include "ESP32Console\Helpers\PWDHelpers.h"
-
 using namespace ESP32Console;
 
 Console console;
