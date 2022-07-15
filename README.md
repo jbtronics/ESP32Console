@@ -1,5 +1,7 @@
 # ESP32Console
 
+[![PlatformIO Registry](https://badges.registry.platformio.org/packages/jbtronics/library/ESP32Console.svg)](https://registry.platformio.org/libraries/jbtronics/ESP32Console)
+
 Arduino library to add a serial console to your ESP32 console. It includes some useful commands and allows to easily add your own custom commands.
 
 This easily allows you to control and configure your control via serial console in a comfortable and easy way.
