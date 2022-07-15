@@ -23,6 +23,9 @@ This library encapsulates the Console component included in the ESP-IDF and allo
 
 ## Usage
 
+### Installation
+This library is available via Arduino Library Manager and [PlatformIO registry](https://registry.platformio.org/libraries/jbtronics/ESP32Console). So just install it via your preferred IDE's library manager and you are ready to start.
+
 ### Basic
 
 To use this library you have to do an `#include <ESP32Console.h>` to import all needed files into your project. This library uses namespaces, so you have to do an `using namespace ESP32Console` to not having to prefix all classes (see example below).
