@@ -1010,6 +1010,7 @@ namespace ESP32Console::Kilo
 
         close(fd);*/
         free(buf);
+        fclose(file);
         E.dirty = 0;
         editorSetStatusMessage("%d bytes written on disk", len);
         return 0;
