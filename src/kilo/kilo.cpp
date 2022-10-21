@@ -1010,7 +1010,12 @@ namespace ESP32Console::Kilo
 
         close(fd);*/
         free(buf);
+
+        //Ensure that the file is really written to FS before closing it
+        fflush(file);
+        fsync(fileno(file));
         fclose(file);
+        
         E.dirty = 0;
         editorSetStatusMessage("%d bytes written on disk", len);
         return 0;
