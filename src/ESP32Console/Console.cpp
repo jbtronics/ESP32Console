@@ -96,6 +96,13 @@ namespace ESP32Console
             return;
         }
 
+        this->uart_channel_ = channel;
+
+        //Reinit the UART driver if the channel was already in use
+        if (uart_is_driver_installed(channel)) {
+            uart_driver_delete(channel);
+        }
+
         /* Drain stdout before reconfiguring it */
         fflush(stdout);
         fsync(fileno(stdout));
@@ -122,10 +129,20 @@ namespace ESP32Console
             .source_clk = UART_SCLK_XTAL,
 #endif
         };
-        /* Install UART driver for interrupt-driven reads and writes */
-        ESP_ERROR_CHECK(uart_driver_install(channel,
-                                            256, 0, 0, NULL, 0));
+    
+
         ESP_ERROR_CHECK(uart_param_config(channel, &uart_config));
+
+        // Set the correct pins for the UART of needed
+        if (rxPin > 0 || txPin > 0) {
+            if (rxPin < 0 || txPin < 0) {
+                log_e("Both rxPin and txPin has to be passed!");
+            }
+            uart_set_pin(channel, txPin, rxPin, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
+        }
+
+        /* Install UART driver for interrupt-driven reads and writes */
+        ESP_ERROR_CHECK(uart_driver_install(channel, 256, 0, 0, NULL, 0));
 
         /* Tell VFS to use UART driver */
         esp_vfs_dev_uart_use_driver(channel);
@@ -136,19 +153,6 @@ namespace ESP32Console
             .hint_color = 333333};
 
         ESP_ERROR_CHECK(esp_console_init(&console_config));
-
-        /* Change standard input and output of the task if the requested UART is
-         * NOT the default one. This block will replace stdin, stdout and stderr.
-         */
-        if (channel != CONFIG_ESP_CONSOLE_UART_NUM)
-        {
-            char path[12] = {0};
-            snprintf(path, 12, "/dev/uart/%d", channel);
-
-            stdin = fopen(path, "r");
-            stdout = fopen(path, "w");
-            stderr = stdout;
-        }
 
         beginCommon();
 
@@ -169,7 +173,21 @@ namespace ESP32Console
 
     void Console::repl_task(void *args)
     {
-        Console &console = *(static_cast<Console *>(args));
+        Console const &console = *(static_cast<Console *>(args));
+
+        /* Change standard input and output of the task if the requested UART is
+         * NOT the default one. This block will replace stdin, stdout and stderr.
+         * We have to do this in the repl task (not in the begin, as these settings are only valid for the current task)
+         */
+        if (console.uart_channel_ != CONFIG_ESP_CONSOLE_UART_NUM)
+        {
+            char path[13] = {0};
+            snprintf(path, 13, "/dev/uart/%d", console.uart_channel_);
+
+            stdin = fopen(path, "r");
+            stdout = fopen(path, "w");
+            stderr = stdout;
+        }
 
         setvbuf(stdin, NULL, _IONBF, 0);
 

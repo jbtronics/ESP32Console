@@ -25,6 +25,8 @@ namespace ESP32Console
         const size_t max_cmdline_len_;
         const size_t max_cmdline_args_;
 
+        uint8_t uart_channel_;
+
         TaskHandle_t task_;
 
         static void repl_task(void *args);
