@@ -1,5 +1,7 @@
 #include "./GPIOCommands.h"
 #include "Arduino.h"
+#include <string>
+#include <stdexcept>
 
 static int _pinmode(int argc, char **argv)
 {

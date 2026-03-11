@@ -1,13 +1,18 @@
 #include "./Console.h"
 #include "soc/soc_caps.h"
 #include "esp_err.h"
+#include "esp_idf_version.h"
 #include "ESP32Console/Commands/CoreCommands.h"
 #include "ESP32Console/Commands/SystemCommands.h"
 #include "ESP32Console/Commands/NetworkCommands.h"
 #include "ESP32Console/Commands/VFSCommands.h"
 #include "ESP32Console/Commands/GPIOCommands.h"
 #include "driver/uart.h"
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+#include "driver/uart_vfs.h"
+#else
 #include "esp_vfs_dev.h"
+#endif
 #include "linenoise/linenoise.h"
 #include "ESP32Console/Helpers/PWDHelpers.h"
 #include "ESP32Console/Helpers/InputParser.h"
@@ -99,8 +104,8 @@ namespace ESP32Console
         this->uart_channel_ = channel;
 
         //Reinit the UART driver if the channel was already in use
-        if (uart_is_driver_installed(channel)) {
-            uart_driver_delete(channel);
+        if (uart_is_driver_installed((uart_port_t)channel)) {
+            uart_driver_delete((uart_port_t)channel);
         }
 
         /* Drain stdout before reconfiguring it */
@@ -111,9 +116,15 @@ namespace ESP32Console
         setvbuf(stdin, NULL, _IONBF, 0);
 
         /* Minicom, screen, idf_monitor send CR when ENTER key is pressed */
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+        uart_vfs_dev_port_set_rx_line_endings(channel, ESP_LINE_ENDINGS_CR);
+        /* Move the caret to the beginning of the next line on '\n' */
+        uart_vfs_dev_port_set_tx_line_endings(channel, ESP_LINE_ENDINGS_CRLF);
+#else
         esp_vfs_dev_uart_port_set_rx_line_endings(channel, ESP_LINE_ENDINGS_CR);
         /* Move the caret to the beginning of the next line on '\n' */
         esp_vfs_dev_uart_port_set_tx_line_endings(channel, ESP_LINE_ENDINGS_CRLF);
+#endif
 
         /* Configure UART. Note that REF_TICK is used so that the baud rate remains
          * correct while APB frequency is changing in light sleep mode.
@@ -131,21 +142,25 @@ namespace ESP32Console
         };
     
 
-        ESP_ERROR_CHECK(uart_param_config(channel, &uart_config));
+        ESP_ERROR_CHECK(uart_param_config((uart_port_t)channel, &uart_config));
 
         // Set the correct pins for the UART of needed
         if (rxPin > 0 || txPin > 0) {
             if (rxPin < 0 || txPin < 0) {
                 log_e("Both rxPin and txPin has to be passed!");
             }
-            uart_set_pin(channel, txPin, rxPin, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
+            uart_set_pin((uart_port_t)channel, txPin, rxPin, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
         }
 
         /* Install UART driver for interrupt-driven reads and writes */
-        ESP_ERROR_CHECK(uart_driver_install(channel, 256, 0, 0, NULL, 0));
+        ESP_ERROR_CHECK(uart_driver_install((uart_port_t)channel, 256, 0, 0, NULL, 0));
 
         /* Tell VFS to use UART driver */
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+        uart_vfs_dev_use_driver(channel);
+#else
         esp_vfs_dev_uart_use_driver(channel);
+#endif
 
         esp_console_config_t console_config = {
             .max_cmdline_length = max_cmdline_len_,

@@ -209,7 +209,9 @@ static void ipconfig_wlan()
     printf("IP: %s\n", WiFi.localIP().toString().c_str());
     printf("Subnet Mask: %s (/%d)\n", WiFi.subnetMask().toString().c_str(), WiFi.subnetCIDR());
     printf("Gateway: %s\n", WiFi.gatewayIP().toString().c_str());
+#if !defined(ESP_ARDUINO_VERSION_MAJOR) || ESP_ARDUINO_VERSION_MAJOR < 3
     printf("IPv6: %s\n", WiFi.localIPv6().toString().c_str());
+#endif
     
     printf("\n");
     printf("Hostname: %s\n", WiFi.getHostname());

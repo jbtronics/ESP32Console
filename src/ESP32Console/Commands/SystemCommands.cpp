@@ -4,11 +4,24 @@
 #include <esp_partition.h>
 #include <esp_ota_ops.h>
 #include <esp_system.h>
+#if __has_include(<esp_chip_info.h>)
+#include <esp_chip_info.h>
+#endif
+#if __has_include(<core_version.h>)
 #include <core_version.h>
+#endif
 #include <getopt.h>
 
-// For XSTR macros
+// For XTSTR macros (Xtensa-specific)
+#if __has_include(<xtensa/xtruntime.h>)
 #include <xtensa/xtruntime.h>
+#else
+// Provide a fallback stringification macro for non-Xtensa architectures (e.g. RISC-V)
+#ifndef XTSTR
+#define _XTSTR(x) #x
+#define XTSTR(x) _XTSTR(x)
+#endif
+#endif
 
 static String mac2String(uint64_t mac)
 {
@@ -84,7 +97,9 @@ static int sysInfo(int argc, char **argv)
     esp_chip_info(&info);
 
     printf("ESP32Console version: %s\n", ESP32CONSOLE_VERSION);
+#if defined(ARDUINO_ESP32_GIT_DESC)
     printf("Arduino Core version: %s (%x)\n", XTSTR(ARDUINO_ESP32_GIT_DESC), ARDUINO_ESP32_GIT_VER);
+#endif
     printf("ESP-IDF Version: %s\n", ESP.getSdkVersion());
 
     printf("\n");
