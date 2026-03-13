@@ -91,7 +91,7 @@ namespace ESP32Console
         registerCoreCommands();
     }
 
-    void Console::begin(int baud, int rxPin, int txPin, uint8_t channel)
+    void Console::begin(int baud, int rxPin, int txPin, uart_port_t channel)
     {
         log_d("Initialize console");
 
@@ -104,8 +104,8 @@ namespace ESP32Console
         this->uart_channel_ = channel;
 
         //Reinit the UART driver if the channel was already in use
-        if (uart_is_driver_installed((uart_port_t)channel)) {
-            uart_driver_delete((uart_port_t)channel);
+        if (uart_is_driver_installed(channel)) {
+            uart_driver_delete(channel);
         }
 
         /* Drain stdout before reconfiguring it */
@@ -142,18 +142,18 @@ namespace ESP32Console
         };
     
 
-        ESP_ERROR_CHECK(uart_param_config((uart_port_t)channel, &uart_config));
+        ESP_ERROR_CHECK(uart_param_config(channel, &uart_config));
 
         // Set the correct pins for the UART of needed
         if (rxPin > 0 || txPin > 0) {
             if (rxPin < 0 || txPin < 0) {
                 log_e("Both rxPin and txPin has to be passed!");
             }
-            uart_set_pin((uart_port_t)channel, txPin, rxPin, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
+            uart_set_pin(channel, txPin, rxPin, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
         }
 
         /* Install UART driver for interrupt-driven reads and writes */
-        ESP_ERROR_CHECK(uart_driver_install((uart_port_t)channel, 256, 0, 0, NULL, 0));
+        ESP_ERROR_CHECK(uart_driver_install(channel, 256, 0, 0, NULL, 0));
 
         /* Tell VFS to use UART driver */
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
