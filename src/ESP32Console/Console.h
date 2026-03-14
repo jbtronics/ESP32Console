@@ -38,7 +38,7 @@ namespace ESP32Console
         /**
          * @brief Create a new ESP32Console with the default parameters
          */
-        Console(const uint32_t task_stack_size = 4096, const BaseType_t task_priority = 2, int max_cmdline_len = 256, int max_cmdline_args = 8) : task_priority_(task_priority), task_stack_size_(task_stack_size), max_cmdline_len_(max_cmdline_len), max_cmdline_args_(max_cmdline_args){};
+        Console(const uint32_t task_stack_size = 4096, const BaseType_t task_priority = 2, int max_cmdline_len = 256, int max_cmdline_args = 32) : task_priority_(task_priority), task_stack_size_(task_stack_size), max_cmdline_len_(max_cmdline_len), max_cmdline_args_(max_cmdline_args){};
 
         ~Console()
         {
