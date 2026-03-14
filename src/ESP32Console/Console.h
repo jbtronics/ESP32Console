@@ -9,6 +9,7 @@
 #include "./ConsoleCommandBase.h"
 #include "freertos/task.h"
 #include "linenoise/linenoise.h"
+#include "driver/uart.h"
 
 namespace ESP32Console
 {
@@ -25,7 +26,7 @@ namespace ESP32Console
         const size_t max_cmdline_len_;
         const size_t max_cmdline_args_;
 
-        uint8_t uart_channel_;
+        uart_port_t uart_channel_;
 
         TaskHandle_t task_;
 
@@ -142,9 +143,22 @@ namespace ESP32Console
          * @param baud The baud rate with which the console should work. Recommended: 115200
          * @param rxPin The pin to use for RX
          * @param txPin The pin to use for TX
-         * @param channel The number of the UART to use
+         * @param channel The UART port to use
          */
-        void begin(int baud, int rxPin = -1, int txPin = -1, uint8_t channel = 0);
+        void begin(int baud, int rxPin = -1, int txPin = -1, uart_port_t channel = UART_NUM_0);
+
+        /**
+         * @brief Starts the console. Overload for backward compatibility with uint8_t channel argument.
+         *
+         * @param baud The baud rate with which the console should work. Recommended: 115200
+         * @param rxPin The pin to use for RX
+         * @param txPin The pin to use for TX
+         * @param channel The number of the UART to use (cast to uart_port_t)
+         */
+        void begin(int baud, int rxPin, int txPin, uint8_t channel)
+        {
+            begin(baud, rxPin, txPin, static_cast<uart_port_t>(channel));
+        }
 
         void end();
     };

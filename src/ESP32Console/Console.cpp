@@ -1,13 +1,18 @@
 #include "./Console.h"
 #include "soc/soc_caps.h"
 #include "esp_err.h"
+#include "esp_idf_version.h"
 #include "ESP32Console/Commands/CoreCommands.h"
 #include "ESP32Console/Commands/SystemCommands.h"
 #include "ESP32Console/Commands/NetworkCommands.h"
 #include "ESP32Console/Commands/VFSCommands.h"
 #include "ESP32Console/Commands/GPIOCommands.h"
 #include "driver/uart.h"
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+#include "driver/uart_vfs.h"
+#else
 #include "esp_vfs_dev.h"
+#endif
 #include "linenoise/linenoise.h"
 #include "ESP32Console/Helpers/PWDHelpers.h"
 #include "ESP32Console/Helpers/InputParser.h"
@@ -86,7 +91,7 @@ namespace ESP32Console
         registerCoreCommands();
     }
 
-    void Console::begin(int baud, int rxPin, int txPin, uint8_t channel)
+    void Console::begin(int baud, int rxPin, int txPin, uart_port_t channel)
     {
         log_d("Initialize console");
 
@@ -111,9 +116,15 @@ namespace ESP32Console
         setvbuf(stdin, NULL, _IONBF, 0);
 
         /* Minicom, screen, idf_monitor send CR when ENTER key is pressed */
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+        uart_vfs_dev_port_set_rx_line_endings(channel, ESP_LINE_ENDINGS_CR);
+        /* Move the caret to the beginning of the next line on '\n' */
+        uart_vfs_dev_port_set_tx_line_endings(channel, ESP_LINE_ENDINGS_CRLF);
+#else
         esp_vfs_dev_uart_port_set_rx_line_endings(channel, ESP_LINE_ENDINGS_CR);
         /* Move the caret to the beginning of the next line on '\n' */
         esp_vfs_dev_uart_port_set_tx_line_endings(channel, ESP_LINE_ENDINGS_CRLF);
+#endif
 
         /* Configure UART. Note that REF_TICK is used so that the baud rate remains
          * correct while APB frequency is changing in light sleep mode.
@@ -145,7 +156,11 @@ namespace ESP32Console
         ESP_ERROR_CHECK(uart_driver_install(channel, 256, 0, 0, NULL, 0));
 
         /* Tell VFS to use UART driver */
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+        uart_vfs_dev_use_driver(channel);
+#else
         esp_vfs_dev_uart_use_driver(channel);
+#endif
 
         esp_console_config_t console_config = {
             .max_cmdline_length = max_cmdline_len_,
